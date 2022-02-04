@@ -1,10 +1,12 @@
+
+
 <?php include 'includes/config.php'; ?>
 <?php include 'includes/header.php'; ?>
 
 <?php
 
 // check if post request contains our post data
-if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['contact_number']) && isset($_POST['address'])) {
+if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])) {
 
   // check if post data is not empty
   if (empty($_POST['username'])) {
@@ -19,39 +21,36 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
     alert("password is required");
     header('Location: /signup.php'); 
     exit();
-  } else if (empty($_POST['contact_number'])) {
-    alert("contact number is required");
-    header('Location: /signup.php');
-    exit();
-  } else if (empty($_POST['address'])) {
-    alert("address is required");
-    header('Location: /signup.php');
-    exit();
-  }
+  } 
 
 //assigning variable
   $username = $_POST['username'];
   $email = $_POST['email'];
   $password = $_POST['password'];
-  $contact_number = $_POST['contact_number'];
-  $address = $_POST['address'];
 
 
-//check if contact number input is a numberical
-  if (!ctype_digit($contact_number)) {
-    alert("contact number must be a number");
-    header('Location: /signup.php');
-    exit();
-  }
+
+
+//check if email exist
+  $select = mysqli_query($conn, "SELECT * FROM user WHERE email = '".$_POST['email']."'");
+    if (mysqli_num_rows($select)) {
+      alert ("This email is already being used");
+      header('Location: /signup.php');
+      exit();
+    } 
+
+
 
 //sql query - insert dlm table
-  $sql = "INSERT INTO users (username, email, password, contact_number, address, role) VALUES ('$username', '$email','$password', $contact_number, '$address', 0)";
+  $sql = "INSERT INTO user (username, email, password, role) VALUES ('$username', '$email','$password', 0)";
 
   $result = mysqli_query($conn, $sql) or trigger_error("Query failed! SQL: $sql - Error: ". mysqli_error($conn),E_USER_ERROR);
   if ($result) {
     alert ("Signup successfull. please login");
+    header('Location: /login.php');
   } else {
     alert ("There was an error during sign up");
+    header('Location: /signup.php');
   }
 
 } 
@@ -59,45 +58,40 @@ if (isset($_POST['username']) && isset($_POST['email']) && isset($_POST['passwor
 ?>
 
 <!-- main -->
-<h1><center><i class="fas fa-pizza-slice" style="color: purple; font-size: 1.5em;"></i> SignUp </h1></center>
 
-<section class="vh-100" style="background-color: #d3f7f6;">
-<main class="flex-shrink-0">
-  <div class="container">
-  <div class="d-flex justify-content-center">
-    <form class="col-5" method="POST">
-      <div class="mb-3">
-        <label for="inputUsername" class="form-label">Username</label>
-        <input type="text" name="username" class="form-control" id="inputUsername">
+  
+
+
+      
+  <section class="vh-100" style="background-color: #470ab1;">
+    <div class="grandParentContaniner">
+      <div class="parentContainer">
+        <form method="POST">
+            <div class="form-group">
+            <div class="mb-3" >
+              <h1><center><i class="fas fa-user-plus" style="color: white; font-size: 1.5em;"></i><i style="color: white"> SignUp </h1></center>
+
+          <div class="mb-3">
+              <label for="inputUsername" class="form-label">Username</label>
+              <input type="text" name="username" class="form-control" id="inputUsername">
+            </div>
+
+          <div class="mb-3">
+            <label for="InputEmail4">Email address</label>
+            <input type="email" name="email" class="form-control" id="InputEmail4">
+            </div>
+
+          <div class="mb-3">
+            <label for="InputPassword4">Password</label>
+            <input type="password"  name="password" class="form-control" id="InputPassword4">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign Up</button>
+
+        </form>
       </div>
-      <div class="mb-3">
-        <label for="inputEmail" class="form-label">Email address</label>
-        <input type="email" name="email" class="form-control" id="inputEmail" aria-describedby="emailHelp">
-        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-      </div>
-      <div class="mb-3">
-        <label for="inputPassword" class="form-label">Password</label>
-        <input type="password" name="password" id="inputPassword" class="form-control" aria-describedby="passwordHelpBlock">
-        <div id="passwordHelpBlock" class="form-text">
-          Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="inputContactNumber" class="form-label">Contact Number</label>
-        <input type="tel" name="contact_number" class="form-control" id="inputContactNumber">
-      </div>
-      <div class="mb-3">
-        <label for="inputAddress" class="form-label">Address</label>
-        <textarea class="form-control" name="address" id="inputAddress" rows="3"></textarea>
-      </div>
-      <div class="d-grid gap-2">
-        <button type="submit" class="btn btn-outline-primary">Sign up</button>
-      </div>
-    </form>
-  </div>
-  </div>
-</main>
-</section>
+    </div>
+  </section>
+
 
 <?php include 'includes/footer.php'; ?>
 </body>
